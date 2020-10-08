@@ -1,5 +1,6 @@
 package cassandra.java.client.repository;
 
+import cassandra.java.client.domain.Book;
 import com.datastax.driver.core.Session;
 
 public class BookRepository {
