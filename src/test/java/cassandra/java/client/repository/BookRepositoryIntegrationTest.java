@@ -6,8 +6,10 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 import cassandra.java.client.CassandraConnector;
+import cassandra.java.client.domain.Book;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Session;
+import com.datastax.driver.core.utils.UUIDs;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -64,7 +66,38 @@ public class BookRepositoryIntegrationTest {
         assertTrue(columnExists);
     }
 
+    @Test
+    public void whenAddingANewBook_thenBookExists() {
+        bookRepository.createTableBooksByTitle();
 
+        String title = "Effective Java";
+        String author = "Joshua Bloch";
+        Book book = new Book(UUIDs.timeBased(), title, author,"Programming");
+        bookRepository.insertbookByTitle(book);
 
+        Book savedBook = bookRepository.selectByTitle(title);
+        assertEquals(book.getTitle(), savedBook.getTitle());
+    }
+
+    @Test
+    public void whenSelectingAll_thenReturnAllRecords() {
+        bookRepository.createTable();
+
+        Book book = new Book(
+                UUIDs.timeBased(), "Effective Java", "Joshua Bloch","Programming");
+        bookRepository.insertbook(book);
+
+        book = new Book(
+                UUIDs.timeBased(), "Clean Code", "Robert C. Martin","Programming");
+        bookRepository.insertbook(book);
+
+        List<Book> books = bookRepository.selectAll();
+
+        assertEquals(2, books.size());
+        assertTrue(books.stream().anyMatch(b -> b.getTitle()
+                .equals("Effective Java")));
+        assertTrue(books.stream().anyMatch(b -> b.getTitle()
+                .equals("Clean Code")));
+    }
 
 }
