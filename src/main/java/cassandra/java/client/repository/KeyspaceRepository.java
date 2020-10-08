@@ -28,5 +28,11 @@ public class KeyspaceRepository {
         session.execute(query);
     }
 
+    public void deleteKeyspace(String keyspaceName) {
+        StringBuilder sb =
+                new StringBuilder("DROP KEYSPACE ").append(keyspaceName);
 
+        String query = sb.toString();
+        session.execute(query);
+    }
 }

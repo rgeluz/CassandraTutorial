@@ -44,4 +44,17 @@ public class KeyspaceRepositoryIntegratonTest {
         assertTrue(matchedKeyspaces.get(0).equals(keyspaceName.toLowerCase()));
     }
 
+    @Test
+    public void whenDeletingAKeyspace_thenDoesNotExist() {
+        String keyspaceName = "library";
+        schemaRepository.deleteKeyspace(keyspaceName);
+
+        ResultSet result =
+                session.execute("SELECT * FROM system_schema.keyspaces;");
+        boolean isKeyspaceCreated = result.all().stream()
+                .anyMatch(r -> r.getString(0).equals(keyspaceName.toLowerCase()));
+
+        assertFalse(isKeyspaceCreated);
+    }
+
 }

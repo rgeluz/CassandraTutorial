@@ -73,6 +73,24 @@ public class BookRepository {
     }
 
 
+    public void insertBookBatch(Book book) {
+        StringBuilder sb = new StringBuilder("BEGIN BATCH ")
+                .append("INSERT INTO ").append(TABLE_NAME)
+                .append("(id, title, subject) ")
+                .append("VALUES (").append(book.getId()).append(", '")
+                .append(book.getTitle()).append("', '")
+                .append(book.getSubject()).append("');")
+                .append("INSERT INTO ")
+                .append(TABLE_NAME_BY_TITLE).append("(id, title) ")
+                .append("VALUES (").append(book.getId()).append(", '")
+                .append(book.getTitle()).append("');")
+                .append("APPLY BATCH;");
+
+        String query = sb.toString();
+        session.execute(query);
+    }
+
+
     public Book selectByTitle(String title) {
         StringBuilder sb = new StringBuilder("SELECT * FROM ")
                 .append(TABLE_NAME_BY_TITLE)
@@ -113,6 +131,26 @@ public class BookRepository {
     }
 
 
+    public List<Book> selectAllBookByTitle() {
+        StringBuilder sb = new StringBuilder("SELECT * FROM ").append(TABLE_NAME_BY_TITLE);
+
+        final String query = sb.toString();
+        ResultSet rs = session.execute(query);
+
+        List<Book> books = new ArrayList<Book>();
+
+        for (Row r : rs) {
+            Book book = new Book(r.getUUID("id"), r.getString("title"), null, null);
+            books.add(book);
+        }
+        return books;
+    }
 
 
+    public void deleteTable(String tableName) {
+        StringBuilder sb = new StringBuilder("DROP TABLE IF EXISTS ").append(tableName);
+
+        final String query = sb.toString();
+        session.execute(query);
+    }
 }

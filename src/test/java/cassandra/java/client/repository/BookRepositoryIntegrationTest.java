@@ -9,6 +9,7 @@ import cassandra.java.client.CassandraConnector;
 import cassandra.java.client.domain.Book;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Session;
+import com.datastax.driver.core.exceptions.InvalidQueryException;
 import com.datastax.driver.core.utils.UUIDs;
 import org.junit.Before;
 import org.junit.Test;
@@ -80,6 +81,32 @@ public class BookRepositoryIntegrationTest {
     }
 
     @Test
+    public void whenAddingANewBookBatch_ThenBookAddedInAllTables() {
+        bookRepository.createTable();
+
+        bookRepository.createTableBooksByTitle();
+
+        String title = "Effective Java";
+        String author = "Joshua Bloch";
+        Book book = new Book(UUIDs.timeBased(), title, author,"Programming");
+        bookRepository.insertBookBatch(book);
+
+        List<Book> books = bookRepository.selectAll();
+
+        assertEquals(1, books.size());
+        assertTrue(
+                books.stream().anyMatch(
+                        b -> b.getTitle().equals("Effective Java")));
+
+        List<Book> booksByTitle = bookRepository.selectAllBookByTitle();
+
+        assertEquals(1, booksByTitle.size());
+        assertTrue(
+                booksByTitle.stream().anyMatch(
+                        b -> b.getTitle().equals("Effective Java")));
+    }
+
+    @Test
     public void whenSelectingAll_thenReturnAllRecords() {
         bookRepository.createTable();
 
@@ -98,6 +125,15 @@ public class BookRepositoryIntegrationTest {
                 .equals("Effective Java")));
         assertTrue(books.stream().anyMatch(b -> b.getTitle()
                 .equals("Clean Code")));
+    }
+
+
+    @Test(expected = InvalidQueryException.class)
+    public void whenDeletingATable_thenUnconfiguredTable() {
+        bookRepository.createTable();
+        bookRepository.deleteTable("books");
+
+        session.execute("SELECT * FROM " + KEYSPACE_NAME + ".books;");
     }
 
 }
