@@ -3,7 +3,7 @@ package cassandra.java.client;
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
 
-public class CassandraClient {
+public class CassandraConnector {
 
     private Cluster cluster;
 

@@ -6,6 +6,16 @@ public class KeyspaceRepository {
 
     private Session session;
 
+    public KeyspaceRepository(Session session) {
+        this.session = session;
+    }
+
+    /**
+     * Create any keyspace - schema
+     * @param keyspaceName              - the name of the schema
+     * @param replicationStrategy       - the replication strategy
+     * @param replicationFactor         - the number of replicas
+     */
     public void createKeyspace(String keyspaceName, String replicationStrategy, int replicationFactor) {
         StringBuilder sb =
                 new StringBuilder("CREATE KEYSPACE IF NOT EXISTS")
