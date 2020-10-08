@@ -4,6 +4,7 @@ import com.datastax.driver.core.Session;
 
 public class BookRepository {
     private static final String TABLE_NAME = "books";
+    private static final String TABLE_NAME_BY_TITLE = TABLE_NAME + "ByTitle";
     private Session session;
 
     public BookRepository(Session session) {
@@ -27,6 +28,16 @@ public class BookRepository {
                 .append(TABLE_NAME).append(" ADD ")
                 .append(columnName).append(" ")
                 .append(columnType).append(";");
+
+        String query = sb.toString();
+        session.execute(query);
+    }
+
+    public void insertbookByTitle(Book book) {
+        StringBuilder sb = new StringBuilder("INSERT INTO ")
+                .append(TABLE_NAME_BY_TITLE).append("(id, title) ")
+                .append("VALUES (").append(book.getId())
+                .append(", '").append(book.getTitle()).append("');");
 
         String query = sb.toString();
         session.execute(query);
